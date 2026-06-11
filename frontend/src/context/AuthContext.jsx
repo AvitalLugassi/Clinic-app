@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { getMe, login as loginService, logout as logoutService } from '../services/auth.service';
+import { getMe, patientLogin, staffLogin, logout as logoutService } from '../services/auth.service';
 
 const AuthContext = createContext(null);
 
@@ -14,10 +14,16 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = async (credentials) => {
-    const res = await loginService(credentials);
-    setUser(res.data.user);
-    return res.data.user;
+  const loginPatient = async (credentials) => {
+    const res = await patientLogin(credentials);
+    setUser(res.data);
+    return res.data;
+  };
+
+  const loginStaff = async (credentials) => {
+    const res = await staffLogin(credentials);
+    setUser(res.data);
+    return res.data;
   };
 
   const logout = async () => {
@@ -26,7 +32,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, loginPatient, loginStaff, logout }}>
       {children}
     </AuthContext.Provider>
   );

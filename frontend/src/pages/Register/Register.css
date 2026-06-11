@@ -1,38 +1,29 @@
-.role-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+.auth-subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem;
+  text-align: center;
 }
 
-.role-options {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.role-option {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.6rem 0.5rem;
-  border: 1.5px solid #d1d5db;
+.auth-success {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #16a34a;
+  padding: 0.6rem 1rem;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 0.85rem;
-  font-weight: 500;
-  color: #374151;
-  transition: border-color 0.2s, background 0.2s;
-  user-select: none;
+  margin: 0;
 }
 
-.role-option input[type='radio'] { display: none; }
-
-.role-option:hover { border-color: #2563eb; background: #eff6ff; }
-
-.role-option-active {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
-  font-weight: 600;
+.register-back {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  padding: 0.25rem;
+  text-decoration: underline;
 }
+
+.register-back:hover { color: #374151; }

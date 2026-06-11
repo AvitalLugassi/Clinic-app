@@ -19,5 +19,7 @@ export function useForm(initialValues, schema) {
 
   const fieldProps = (name) => ({ name, value: form[name], onChange, error: fieldErrors[name] });
 
-  return { form, validate, fieldProps, onChange };
+  const resetForm = () => { setForm(initialValues); setFieldErrors({}); };
+
+  return { form, validate, fieldProps, onChange, resetForm };
 }

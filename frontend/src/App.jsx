@@ -13,6 +13,15 @@ import PatientProfile from './pages/PatientProfile/PatientProfile';
 import Reports from './pages/Reports/Reports';
 import NotFound from './pages/NotFound/NotFound';
 
+const ROLE_ROUTES = [
+  { path: 'dashboard',          element: <Dashboard />,          roles: ['patient', 'doctor', 'admin'] },
+  { path: 'appointments',       element: <AppointmentCalendar />, roles: ['patient', 'doctor'] },
+  { path: 'appointments/book',  element: <BookAppointment />,     roles: ['patient'] },
+  { path: 'records',            element: <MedicalRecord />,       roles: ['patient', 'doctor'] },
+  { path: 'profile',            element: <PatientProfile />,      roles: ['patient'] },
+  { path: 'reports',            element: <Reports />,             roles: ['admin'] },
+];
+
 function AppRoutes() {
   return (
     <Routes>
@@ -22,23 +31,11 @@ function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-
-          <Route path="/appointments" element={
-            <ProtectedRoute roles={['admin', 'doctor', 'patient']}><AppointmentCalendar /></ProtectedRoute>
-          } />
-          <Route path="/appointments/book" element={
-            <ProtectedRoute roles={['patient']}><BookAppointment /></ProtectedRoute>
-          } />
-          <Route path="/records" element={
-            <ProtectedRoute roles={['admin', 'doctor', 'patient']}><MedicalRecord /></ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute roles={['patient']}><PatientProfile /></ProtectedRoute>
-          } />
-          <Route path="/reports" element={
-            <ProtectedRoute roles={['admin']}><Reports /></ProtectedRoute>
-          } />
+          {ROLE_ROUTES.map(({ path, element, roles }) => (
+            <Route key={path} path={`/${path}`} element={
+              <ProtectedRoute roles={roles}>{element}</ProtectedRoute>
+            } />
+          ))}
         </Route>
       </Route>
 
