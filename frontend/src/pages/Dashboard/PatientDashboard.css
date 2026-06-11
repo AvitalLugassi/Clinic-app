@@ -1,0 +1,47 @@
+.patient-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding: 1.75rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── Main area: center content + sidebar ── */
+.patient-dashboard__main {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.patient-dashboard__center {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ── Bottom row: prescriptions + timeline side by side ── */
+.patient-dashboard__bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .patient-dashboard__main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .patient-dashboard__bottom-row {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-dashboard {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+}

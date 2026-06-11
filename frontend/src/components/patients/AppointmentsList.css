@@ -1,0 +1,65 @@
+.appts-list {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.appts-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.appts-list__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.appts-list__empty {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.appts-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.appts-list__table thead tr {
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.appts-list__table th {
+  text-align: right;
+  padding: 0.6rem 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.appts-list__table td {
+  padding: 0.85rem 0.75rem;
+  color: #1e293b;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.appts-list__table tbody tr:hover { background: #f8fafc; }
+
+.appts-list__badge {
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.appts-list__badge--confirmed { background: #dcfce7; color: #16a34a; }
+.appts-list__badge--pending   { background: #fef9c3; color: #ca8a04; }
+.appts-list__badge--cancelled { background: #fee2e2; color: #dc2626; }
