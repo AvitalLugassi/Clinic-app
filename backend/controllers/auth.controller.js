@@ -10,21 +10,30 @@ const hashId = (id) => crypto.createHash('sha256').update(id).digest('hex');
 
 const COOKIE_OPTS = { httpOnly: true, sameSite: 'lax' };
 
-const signAndSend = (res, user) => {
+const signAndSend = async (res, user) => {
   const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
-  const refreshToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+  const newRefreshToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await pool.query(
+    'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+    [user.id, newRefreshToken, expiresAt]
+  );
 
   res.cookie('token', accessToken, { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 });
-  res.cookie('refreshToken', refreshToken, { ...COOKIE_OPTS, maxAge: 7 * 24 * 60 * 60 * 1000 });
+  res.cookie('refreshToken', newRefreshToken, { ...COOKIE_OPTS, maxAge: 7 * 24 * 60 * 60 * 1000 });
   res.json({ id: user.id, role: user.role });
 };
 
-export const refreshToken = (req, res) => {
+export const refreshToken = async (req, res) => {
   const token = req.cookies?.refreshToken;
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   try {
     const user = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const [rows] = await pool.query('SELECT id FROM refresh_tokens WHERE token = ? AND user_id = ?', [token, user.id]);
+    if (!rows[0]) return res.status(401).json({ message: 'Invalid refresh token' });
+
     const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
     res.cookie('token', accessToken, { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 });
     res.json({ id: user.id, role: user.role });
@@ -105,8 +114,8 @@ export const staffRegister = async (req, res) => {
   const user_uuid = uuidv4();
 
   const [result] = await pool.query(
-    'INSERT INTO users (user_uuid, full_name, email, password_hash, role, phone, is_active, is_app_registered, created_at) VALUES (?, ?, ?, ?, ?, ?, 1, 1, NOW())',
-    [user_uuid, full_name, email, password_hash, role, phone || null]
+    'INSERT INTO users (user_uuid, full_name, email, password_hash, national_id_hash, role, phone, is_active, is_app_registered, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1, NOW())',
+    [user_uuid, full_name, email, password_hash, id_number ? hashId(id_number) : null, role, phone || null]
   );
 
   if (role === 'doctor') {
@@ -171,7 +180,9 @@ export const staffLogin = async (req, res) => {
   signAndSend(res, user);
 };
 
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
+  const token = req.cookies?.refreshToken;
+  if (token) await pool.query('DELETE FROM refresh_tokens WHERE token = ?', [token]);
   res.clearCookie('token');
   res.clearCookie('refreshToken');
   res.json({ message: 'Logged out' });

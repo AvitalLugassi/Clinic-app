@@ -17,13 +17,9 @@ export const requireOtp = (purpose) => (req, res, next) => {
   if (!otpToken) return res.status(403).json({ message: 'OTP required' });
 
   try {
-    const decoded = Buffer.from(otpToken, 'base64').toString('utf8');
-    const [userId, tokenPurpose, expiresAt] = decoded.split(':');
-
-    if (Number(userId) !== req.user.id) return res.status(403).json({ message: 'Invalid OTP token' });
-    if (tokenPurpose !== purpose) return res.status(403).json({ message: 'Invalid OTP purpose' });
-    if (Date.now() > Number(expiresAt)) return res.status(403).json({ message: 'OTP token expired' });
-
+    const decoded = jwt.verify(otpToken, process.env.JWT_SECRET);
+    if (decoded.userId !== req.user.id) return res.status(403).json({ message: 'Invalid OTP token' });
+    if (decoded.purpose !== purpose) return res.status(403).json({ message: 'Invalid OTP purpose' });
     next();
   } catch {
     res.status(403).json({ message: 'Invalid OTP token' });

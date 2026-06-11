@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import pool from '../config/db.mysql.js';
 import { sendOtpEmail } from '../services/email.service.js';
 
@@ -47,8 +48,11 @@ export const verifyOtp = async (req, res) => {
 
   await pool.query('UPDATE otps SET used = 1 WHERE id = ?', [otp.id]);
 
-  const otpToken = `${req.user.id}:${purpose}:${Date.now() + OTP_TTL_MINUTES * 60 * 1000}`;
-  const encoded = Buffer.from(otpToken).toString('base64');
+  const otpToken = jwt.sign(
+    { userId: req.user.id, purpose },
+    process.env.JWT_SECRET,
+    { expiresIn: `${OTP_TTL_MINUTES}m` }
+  );
 
-  res.json({ otpToken: encoded });
+  res.json({ otpToken });
 };
