@@ -3,9 +3,10 @@ import Button from '../ui/Button/Button';
 import './AppointmentsList.css';
 
 const STATUS_LABEL = {
-  confirmed: { text: 'מאושר',  cls: 'confirmed'  },
-  pending:   { text: 'ממתין',  cls: 'pending'    },
-  cancelled: { text: 'בוטל',   cls: 'cancelled'  },
+  confirmed: { text: 'מאושר',   cls: 'confirmed'  },
+  pending:   { text: 'ממתין',   cls: 'pending'    },
+  cancelled: { text: 'בוטל',    cls: 'cancelled'  },
+  completed: { text: 'הושלם',   cls: 'completed'  },
 };
 
 export default function AppointmentsList({ appointments = [] }) {
