@@ -1,22 +1,35 @@
-import { useState } from 'react';
 import useAuth from '../../hooks/useAuth';
+import { useForm } from '../../hooks/useForm';
+import AuthCard from '../../components/ui/AuthCard/AuthCard';
+import Input from '../../components/ui/Input/Input';
+import Button from '../../components/ui/Button/Button';
+
+const SCHEMA = {
+  email: { required: true, email: true },
+  password: { required: true },
+};
 
 export default function Login() {
   const { handleLogin, submitting, error } = useAuth();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const { form, validate, fieldProps } = useForm({ email: '', password: '' }, SCHEMA);
 
-  const onChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
-  const onSubmit = (e) => { e.preventDefault(); handleLogin(form); };
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (validate()) handleLogin(form);
+  };
 
   return (
-    <form onSubmit={onSubmit}>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <input name="email" value={form.email} onChange={onChange} placeholder="Email" />
-      <input name="password" type="password" value={form.password} onChange={onChange} placeholder="Password" />
-      <button type="submit" disabled={submitting}>
-        {submitting ? 'Logging in...' : 'Login'}
-      </button>
-    </form>
+    <AuthCard
+      subtitle="Sign in to your account"
+      onSubmit={onSubmit}
+      error={error}
+      footer={{ text: "Don't have an account?", to: '/register', linkLabel: 'Register' }}
+    >
+      <Input label="Email" type="email" placeholder="you@example.com" disabled={submitting} {...fieldProps('email')} />
+      <Input label="Password" type="password" placeholder="••••••••" disabled={submitting} {...fieldProps('password')} />
+      <Button type="submit" fullWidth disabled={submitting} size="lg">
+        {submitting ? 'Signing in...' : 'Sign In'}
+      </Button>
+    </AuthCard>
   );
 }

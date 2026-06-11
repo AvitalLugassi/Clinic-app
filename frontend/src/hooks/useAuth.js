@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext';
+import { register } from '../services/auth.service';
 import useAsyncAction from './useAsyncAction';
 
 export default function useAuth() {
@@ -13,5 +14,10 @@ export default function useAuth() {
     navigate(routes[loggedUser.role] ?? '/');
   });
 
-  return { user, loading, submitting, error, handleLogin, logout };
+  const handleRegister = (userData) => execute(async () => {
+    await register(userData);
+    navigate('/login');
+  });
+
+  return { user, loading, submitting, error, handleLogin, handleRegister, logout };
 }

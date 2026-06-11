@@ -1,0 +1,38 @@
+.role-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.role-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.role-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.5rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.role-option input[type='radio'] { display: none; }
+
+.role-option:hover { border-color: #2563eb; background: #eff6ff; }
+
+.role-option-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+}

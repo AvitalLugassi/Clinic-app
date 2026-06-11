@@ -1,4 +1,4 @@
-import Dashboard from '../../components/ui/Dashboard/Dashboard';
+import StatsGrid from '../../components/ui/StatsGrid/StatsGrid';
 
 const cards = [
   { icon: '📅', label: 'Next Appointment', value: null },
@@ -8,5 +8,5 @@ const cards = [
 ];
 
 export default function PatientDashboard() {
-  return <Dashboard title="Patient Dashboard" cards={cards} />;
+  return <StatsGrid title="Patient Dashboard" cards={cards} />;
 }
