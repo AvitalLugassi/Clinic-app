@@ -10,7 +10,7 @@ const TABS = {
   patient: {
     label: '🙋 מטופל',
     fields: [
-      { name: 'id_number', label: 'מספר זהות', type: 'text', placeholder: '123456789', rules: { required: true } },
+      { name: 'id_number', label: 'מספר זהות', type: 'text', placeholder: '123456789', rules: { required: true, idNumber: true } },
     ],
   },
   staff: {
@@ -26,10 +26,13 @@ export default function Login() {
   const { handlePatientLogin, handleStaffLogin, submitting, error } = useAuth();
 
   const { fields } = TABS[tab];
-  const schema = Object.fromEntries(fields.map(f => [f.name, f.rules]));
+  const schema = {
+    ...Object.fromEntries(fields.map(f => [f.name, f.rules])),
+    password: { required: true },
+  };
   const initial = Object.fromEntries([...fields.map(f => [f.name, '']), ['password', '']]);
 
-  const { form, validate, fieldProps, resetForm } = useForm(initial, { ...schema, password: { required: true } });
+  const { form, validate, fieldProps, resetForm } = useForm(initial, schema);
 
   const handleTabChange = (t) => { setTab(t); resetForm(); };
 
