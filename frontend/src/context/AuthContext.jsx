@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import { getMe, patientLogin, staffLogin, logout as logoutService } from '../services/auth.service';
 
 const AuthContext = createContext(null);
@@ -15,15 +15,17 @@ export function AuthProvider({ children }) {
   }, []);
 
   const loginPatient = async (credentials) => {
-    const res = await patientLogin(credentials);
-    setUser(res.data);
-    return res.data;
+    await patientLogin(credentials);
+    const me = await getMe();
+    setUser(me.data);
+    return me.data;
   };
 
   const loginStaff = async (credentials) => {
-    const res = await staffLogin(credentials);
-    setUser(res.data);
-    return res.data;
+    await staffLogin(credentials);
+    const me = await getMe();
+    setUser(me.data);
+    return me.data;
   };
 
   const logout = async () => {

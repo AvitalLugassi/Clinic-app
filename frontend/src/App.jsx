@@ -7,7 +7,6 @@ import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import AppointmentCalendar from './pages/AppointmentCalendar/AppointmentCalendar';
-import BookAppointment from './pages/BookAppointment/BookAppointment';
 import MedicalRecord from './pages/MedicalRecord/MedicalRecord';
 import PatientProfile from './pages/PatientProfile/PatientProfile';
 import Reports from './pages/Reports/Reports';
@@ -16,8 +15,7 @@ import DoctorActivate from './pages/DoctorActivate/DoctorActivate';
 
 const ROLE_ROUTES = [
   { path: 'dashboard',          element: <Dashboard />,          roles: ['patient', 'doctor', 'admin'] },
-  { path: 'appointments',       element: <AppointmentCalendar />, roles: ['patient', 'doctor'] },
-  { path: 'appointments/book',  element: <BookAppointment />,     roles: ['patient'] },
+  { path: 'appointments', element: <AppointmentCalendar />, roles: ['patient', 'doctor'] },
   { path: 'records',            element: <MedicalRecord />,       roles: ['patient', 'doctor'] },
   { path: 'profile',            element: <PatientProfile />,      roles: ['patient'] },
   { path: 'reports',            element: <Reports />,             roles: ['admin'] },
@@ -48,7 +46,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <NotificationProvider>
           <AppRoutes />
