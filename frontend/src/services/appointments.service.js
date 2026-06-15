@@ -1,20 +1,60 @@
+
 import api from './api';
 
-const appointmentsService = {
-  getAppointments: () => api.get('/appointments').then(r => r.data),
-
-  getDepartments: () => api.get('/departments').then(r => r.data),
-
-  getDoctorsByDepartment: (departmentId) =>
-    api.get(`/doctors?department_id=${departmentId}`).then(r => r.data),
-
-  getDoctorAvailability: (doctorId, dayName) =>
-    api.get(`/doctors/${doctorId}/availability?day=${dayName}`).then(r => r.data),
-
-  getBookedSlots: (doctorId, date) =>
-    api.get(`/appointments/booked?doctor_id=${doctorId}&date=${date}`).then(r => r.data),
-
-  bookAppointment: (data) => api.post('/appointments', data).then(r => r.data),
+/**
+ * יצירת תור חדש במערכת
+ * @param {Object} appointmentData - מכיל: patient_id, doctor_id, scheduled_at
+ */
+export const createAppointment = async (appointmentData) => {
+  const response = await api.post('/appointments', appointmentData);
+  return response.data;
 };
 
-export default appointmentsService;
+/**
+ * שליפת כל התורים של פציינט ספציפי
+ * @param {number} patientId 
+ */
+export const getAppointmentsByPatient = async (patientId) => {
+  const response = await api.get(`/appointments/patient/${patientId}`);
+  return response.data;
+};
+
+/**
+ * שליפת כל התורים של רופא ספציפי
+ * @param {number} doctorId 
+ */
+export const getAppointmentsByDoctor = async (doctorId) => {
+  const response = await api.get(`/appointments/doctor/${doctorId}`);
+  return response.data;
+};
+
+/**
+ * עדכון סטטוס של תור (למשל: 'confirmed', 'cancelled', 'completed')
+ * @param {number} id - מפתח ראשי של התור
+ * @param {string} status 
+ */
+export const updateAppointmentStatus = async (id, status) => {
+  const response = await api.patch(`/appointments/${id}/status`, { status });
+  return response.data;
+};
+
+/**
+ * שליפת שעות פנויות של רופא ביום מסוים (מניעת כפילויות וקריאות סרק)
+ * @param {number} doctorId 
+ * @param {string} date - פורמט YYYY-MM-DD
+ */
+export const getAvailableSlots = async (doctorId, date) => {
+  const response = await api.get('/appointments/available-slots', {
+    params: { doctorId, date }
+  });
+  return response.data;
+};
+
+/**
+ * מחיקת/ביטול תור מהמערכת
+ * @param {number} id 
+ */
+export const deleteAppointment = async (id) => {
+  const response = await api.delete(`/appointments/${id}`);
+  return response.data;
+};
