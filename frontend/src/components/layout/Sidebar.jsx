@@ -18,7 +18,7 @@ const links = {
   ],
   patient: [
     { to: '/dashboard', label: '📊 Dashboard' },
-    { to: '/appointments/book', label: '📅 Book Appointment' },
+    { to: '/appointments', label: '📅 Book Appointment' },
     { to: '/records', label: '📋 My Records' },
     { to: '/prescriptions', label: '💊 My Prescriptions' },
     { to: '/profile', label: '👤 Profile' },

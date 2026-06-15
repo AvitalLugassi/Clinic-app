@@ -1,7 +1,7 @@
 import './PatientDashboard.css';
 import WelcomeBanner     from '../../components/patients/WelcomeBanner';
 import ProfileSnapshot   from '../../components/patients/ProfileSnapshot';
-import QuickActions      from '../../components/patients/QuickActions';
+import BookingWizard     from '../../components/appointments/BookingWizard';
 import AppointmentsList  from '../../components/patients/AppointmentsList';
 import PrescriptionsList from '../../components/patients/PrescriptionsList';
 import MedicalTimeline   from '../../components/patients/MedicalTimeline';
@@ -53,19 +53,14 @@ export default function PatientDashboard() {
 
   return (
     <div className="patient-dashboard">
-      <WelcomeBanner nextAppointment={nextAppointment} />
-
       <div className="patient-dashboard__main">
         <div className="patient-dashboard__center">
-          <QuickActions />
           <AppointmentsList appointments={apptList} />
           <div className="patient-dashboard__bottom-row">
             <PrescriptionsList prescriptions={rxList} />
             <MedicalTimeline events={[]} />
           </div>
         </div>
-
-        <ProfileSnapshot patient={profileData} />
       </div>
     </div>
   );
