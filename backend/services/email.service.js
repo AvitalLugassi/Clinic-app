@@ -23,6 +23,22 @@ export const sendRegistrationOtp = async (to, code) => {
   });
 };
 
+export const sendStaffActivationOtp = async (to, code, role) => {
+  const roleLabel = role === 'admin' ? 'מנהל' : 'רופא';
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to,
+    subject: `הפעלת חשבון ${roleLabel} - Clinic App`,
+    html: `
+      <div style="font-family:Arial,sans-serif;direction:rtl;text-align:right">
+        <h2>ברוך הבא ל-Clinic App</h2>
+        <p>קיבלת חשבון ${roleLabel} במרפאה. להשלמת ההפעלה וקביעת סיסמה, הזן את הקוד הבא:</p>
+        <h1 style="letter-spacing:8px;color:#2563eb">${code}</h1>
+        <p>הקוד תקף ל-10 דקות בלבד.</p>
+      </div>
+    `,
+  });
+};
 export const sendOtpEmail = async (to, code, purpose) => {
   const purposeLabel = purpose === 'view_records' ? 'צפייה ברשומות רפואיות' : 'פעולה רגישה';
   await transporter.sendMail({

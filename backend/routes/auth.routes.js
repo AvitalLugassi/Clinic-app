@@ -9,6 +9,8 @@ import {
   logout,
   getMe,
   refreshToken,
+  doctorPreActivate,
+  doctorCompleteActivate,
 } from '../controllers/auth.controller.js';
 import { requestOtp, verifyOtp } from '../controllers/otp.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
@@ -30,6 +32,10 @@ router.post('/patient-complete-register', patientCompleteRegister);
 // רישום צוות + פציינט ע"י אדמין בלבד
 router.post('/staff-register', verifyToken, requireRole('admin'), staffRegister);
 router.post('/admin-register-patient', verifyToken, requireRole('admin'), adminRegisterPatient);
+
+// הפעלת חשבון רופא (דו-שלבי, ציבורי)
+router.post('/doctor-pre-activate', doctorPreActivate);
+router.post('/doctor-complete-activate', doctorCompleteActivate);
 
 // OTP
 router.post('/otp/request', verifyToken, requestOtp);

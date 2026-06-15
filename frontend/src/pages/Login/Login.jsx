@@ -27,11 +27,12 @@ export default function Login() {
 
   const { fields } = TABS[tab];
   const schema = Object.fromEntries(fields.map(f => [f.name, f.rules]));
-  const initial = Object.fromEntries([...fields.map(f => [f.name, '']), ['password', '']]);
 
-  const { form, validate, fieldProps, resetForm } = useForm(initial, { ...schema, password: { required: true } });
+  const getInitial = (t) => Object.fromEntries([...TABS[t].fields.map(f => [f.name, '']), ['password', '']]);
 
-  const handleTabChange = (t) => { setTab(t); resetForm(); };
+  const { form, validate, fieldProps, resetForm } = useForm(getInitial(tab), { ...schema, password: { required: true } });
+
+  const handleTabChange = (t) => { setTab(t); resetForm(getInitial(t)); };
 
   const onSubmit = (e) => {
     e.preventDefault();

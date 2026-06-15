@@ -1,9 +1,12 @@
 import './StatsGrid.css';
 
-export default function StatsGrid({ title, cards }) {
+export default function StatsGrid({ title, cards, actions }) {
   return (
     <div className="stats-grid">
-      <h2 className="stats-grid-title">{title}</h2>
+      <div className="stats-grid-header">
+        <h2 className="stats-grid-title">{title}</h2>
+        {actions && <div>{actions}</div>}
+      </div>
       <div className="stats-grid-cards">
         {cards.map((card) => (
           <div key={card.label} className="stats-grid-card">

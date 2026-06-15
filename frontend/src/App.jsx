@@ -12,6 +12,7 @@ import MedicalRecord from './pages/MedicalRecord/MedicalRecord';
 import PatientProfile from './pages/PatientProfile/PatientProfile';
 import Reports from './pages/Reports/Reports';
 import NotFound from './pages/NotFound/NotFound';
+import DoctorActivate from './pages/DoctorActivate/DoctorActivate';
 
 const ROLE_ROUTES = [
   { path: 'dashboard',          element: <Dashboard />,          roles: ['patient', 'doctor', 'admin'] },
@@ -27,6 +28,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/doctor-activate" element={<DoctorActivate />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>

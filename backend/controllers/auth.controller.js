@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import pool from '../config/db.mysql.js';
-import { sendRegistrationOtp } from '../services/email.service.js';
+import { sendRegistrationOtp, sendStaffActivationOtp } from '../services/email.service.js';
 
 const STAFF_EMAIL_DOMAIN = '@clinic-app.com';
 const hashId = (id) => crypto.createHash('sha256').update(id).digest('hex');
@@ -101,28 +101,84 @@ export const patientCompleteRegister = async (req, res) => {
 };
 
 // רישום רופא/אדמין — רק ע"י אדמין
+// רופא נוצר ללא סיסמה (is_app_registered=0) ומשלים הפעלה בנפרד
 export const staffRegister = async (req, res) => {
-  const { full_name, email, password, role, phone, id_number } = req.body;
-  if (!full_name || !email || !password || !role) return res.status(400).json({ message: 'Missing fields' });
+  const { full_name, email, role, phone, id_number } = req.body;
+  if (!full_name || !email || !role) return res.status(400).json({ message: 'Missing fields' });
   if (!['doctor', 'admin'].includes(role)) return res.status(400).json({ message: 'תפקיד לא חוקי' });
   if (!email.endsWith(STAFF_EMAIL_DOMAIN)) return res.status(400).json({ message: `מייל חייב להסתיים ב-${STAFF_EMAIL_DOMAIN}` });
-
   const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
   if (existing.length) return res.status(409).json({ message: 'מייל כבר קיים במערכת' });
 
-  const password_hash = await bcrypt.hash(password, 10);
   const user_uuid = uuidv4();
+  const isDoctor = role === 'doctor';
 
   const [result] = await pool.query(
-    'INSERT INTO users (user_uuid, full_name, email, password_hash, national_id_hash, role, phone, is_active, is_app_registered, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1, NOW())',
-    [user_uuid, full_name, email, password_hash, id_number ? hashId(id_number) : null, role, phone || null]
+    'INSERT INTO users (user_uuid, full_name, email, password_hash, national_id_hash, role, phone, is_active, is_app_registered, created_at) VALUES (?, ?, ?, NULL, ?, ?, ?, 1, 0, NOW())',
+    [user_uuid, full_name, email, id_number ? hashId(id_number) : null, role, phone || null]
   );
 
-  if (role === 'doctor') {
+  if (isDoctor) {
     await pool.query('INSERT INTO doctors (user_id, created_at) VALUES (?, NOW())', [result.insertId]);
   }
 
-  res.status(201).json({ message: `${role === 'doctor' ? 'רופא' : 'אדמין'} נוסף בהצלחה` });
+  const code = crypto.randomInt(100000, 999999).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  await pool.query('INSERT INTO otps (user_id, code, purpose, expires_at) VALUES (?, ?, ?, ?)', [result.insertId, code, 'activation', expiresAt]);
+  await sendStaffActivationOtp(email, code, role);
+
+  res.status(201).json({ message: `${isDoctor ? 'רופא' : 'אדמין'} נוסף בהצלחה. נשלח קוד הפעלה למייל.` });
+};
+
+// שלב 1: צוות מזין מייל — שליחת OTP להפעלת חשבון
+export const doctorPreActivate = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Missing email' });
+
+  const [rows] = await pool.query(
+    "SELECT id, role FROM users WHERE email = ? AND role IN ('doctor','admin') AND is_app_registered = 0 AND is_active = 1",
+    [email]
+  );
+  const user = rows[0];
+  if (!user) return res.status(404).json({ message: 'לא נמצא חשבון ממתין להפעלה עבור מייל זה' });
+
+  const code = crypto.randomInt(100000, 999999).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  await pool.query('DELETE FROM otps WHERE user_id = ? AND purpose = ?', [user.id, 'activation']);
+  await pool.query('INSERT INTO otps (user_id, code, purpose, expires_at) VALUES (?, ?, ?, ?)', [user.id, code, 'activation', expiresAt]);
+
+  await sendStaffActivationOtp(email, code, user.role);
+  res.json({ message: 'נשלח קוד אימות לכתובת המייל' });
+};
+
+// שלב 2: צוות מאמת OTP וקובע סיסמה
+export const doctorCompleteActivate = async (req, res) => {
+  const { email, otp, password } = req.body;
+  if (!email || !otp || !password) return res.status(400).json({ message: 'Missing fields' });
+  if (password.length < 6) return res.status(400).json({ message: 'הסיסמה חייבת להכיל לפחות 6 תווים' });
+
+  const [rows] = await pool.query(
+    "SELECT id FROM users WHERE email = ? AND role IN ('doctor','admin') AND is_app_registered = 0",
+    [email]
+  );
+  const user = rows[0];
+  if (!user) return res.status(404).json({ message: 'משתמש לא נמצא' });
+
+  const [otpRows] = await pool.query(
+    'SELECT id, expires_at, used FROM otps WHERE user_id = ? AND code = ? AND purpose = ?',
+    [user.id, otp, 'activation']
+  );
+  const record = otpRows[0];
+  if (!record) return res.status(401).json({ message: 'קוד שגוי' });
+  if (record.used) return res.status(401).json({ message: 'קוד כבר נוצל' });
+  if (new Date() > new Date(record.expires_at)) return res.status(401).json({ message: 'הקוד פג תוקף' });
+
+  const password_hash = await bcrypt.hash(password, 10);
+  await pool.query('UPDATE users SET password_hash = ?, is_app_registered = 1 WHERE id = ?', [password_hash, user.id]);
+  await pool.query('UPDATE otps SET used = 1 WHERE id = ?', [record.id]);
+
+  res.json({ message: 'החשבון הופעל בהצלחה! כעת תוכל/י להתחבר.' });
 };
 
 // רישום פציינט ע"י אדמין (ללא אפשרות אפליקציה עדיין)
@@ -169,13 +225,14 @@ export const staffLogin = async (req, res) => {
     return res.status(401).json({ message: 'מייל שגוי או סיסמה שגויה' });
 
   const [rows] = await pool.query(
-    "SELECT id, password_hash, role, is_active FROM users WHERE email = ? AND role IN ('doctor', 'admin')",
+    "SELECT id, password_hash, role, is_active, is_app_registered FROM users WHERE email = ? AND role IN ('doctor', 'admin')",
     [email]
   );
   const user = rows[0];
-  if (!user || !(await bcrypt.compare(password, user.password_hash)))
+  if (!user || !user.password_hash || !(await bcrypt.compare(password, user.password_hash)))
     return res.status(401).json({ message: 'מייל שגוי או סיסמה שגויה' });
   if (!user.is_active) return res.status(403).json({ message: 'החשבון מושבת' });
+  if (!user.is_app_registered) return res.status(403).json({ message: 'עליך להשלים את הפעלת החשבון', code: 'ACCOUNT_NOT_ACTIVATED' });
 
   signAndSend(res, user);
 };
