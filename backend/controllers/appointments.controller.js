@@ -1,8 +1,8 @@
-const appointmentsService = require('../services/appointments.service');
+
+import appointmentsService from '../services/appointments.service.js'; 
 const { CLINIC_START_TIME, CLINIC_END_TIME, SLOT_DURATION_MINUTES } = require('../config/clinic.config');
 const { v4: uuidv4 } = require('uuid');
 
-// 1. יצירת תור
 const createAppointment = async (req, res) => {
     try {
         const { patient_id, doctor_id, scheduled_at } = req.body;
@@ -27,7 +27,6 @@ const createAppointment = async (req, res) => {
     }
 };
 
-// 2. שליפת שעות פנויות (כולל יצירת מערך השעות בצורה דינמית)
 const getDoctorAvailability = async (req, res) => {
     try {
         const { doctor_id, date } = req.query;
@@ -66,7 +65,6 @@ const getDoctorAvailability = async (req, res) => {
   }
 };
 
-// 3. עדכון סטטוס תור (חדש - תואם ל-Router)
 const updateAppointmentStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -89,7 +87,6 @@ const updateAppointmentStatus = async (req, res) => {
     }
 };
 
-// 4. שליפת תורים של מטופל (חדש - תואם ל-Router)
 const getPatientAppointments = async (req, res) => {
     try {
         // הערה: בשלב מתקדם ה-patient_id יגיע מה-Token (req.user.id), כרגע נביא אותו משרשור ה-Query לצורך בדיקה
@@ -107,9 +104,26 @@ const getPatientAppointments = async (req, res) => {
     }
 };
 
-module.exports = {
+const getDoctorAppointments = async (req, res) => {
+try {
+        const { doctor_id } = req.params;
+
+        if (!doctor_id) {
+            return res.status(400).json({ message: "מזהה רופא הוא שדה חובה" });
+        }
+
+        const appointments = await appointmentsService.getAppointmentsByDoctor(doctor_id);
+        return res.status(200).json(appointments);
+    } catch (error) {
+        console.error("Error in getAppointmentsByDoctor:", error);
+        return res.status(500).json({ message: "שגיאה בשליפת תורי הרופא" });
+    }
+};
+
+export default {
     createAppointment,
     getDoctorAvailability,
     updateAppointmentStatus,
-    getPatientAppointments
+    getPatientAppointments,
+    getDoctorAppointments
 };
