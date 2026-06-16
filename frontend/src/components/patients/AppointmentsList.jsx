@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button/Button';
 import './AppointmentsList.css';
+import { useAuthContext } from '../../context/AuthContext';
 
 const STATUS_LABEL = {
   confirmed: { text: 'מאושר',   cls: 'confirmed'  },
@@ -11,12 +12,13 @@ const STATUS_LABEL = {
 
 export default function AppointmentsList({ appointments = [] }) {
   const navigate = useNavigate();
+  const { user } = useAuthContext();
 
   return (
     <section className="appts-list">
       <div className="appts-list__header">
         <h2 className="appts-list__title">התורים הקרובים</h2>
-        <Button variant="ghost" size="sm" onClick={() => navigate('/appointments')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate(user?.user_uuid ? `/${user.user_uuid}/appointments` : '/login')}>
           צפה בכל התורים ←
         </Button>
       </div>

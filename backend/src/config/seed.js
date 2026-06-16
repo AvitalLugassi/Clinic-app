@@ -10,7 +10,6 @@ const seed = async () => {
   try {
     await conn.beginTransaction();
 
-    // ── Departments ──────────────────────────────────────────────
     await conn.query(`
       INSERT IGNORE INTO departments (id, name, description, is_active) VALUES
       (1, 'Cardiology',   'Heart and cardiovascular system', 1),
@@ -23,14 +22,17 @@ const seed = async () => {
     const doctorPass = await bcrypt.hash('Doctor123!',  10);
     const patientPass= await bcrypt.hash('Patient123!', 10);
 
+    const adminId = '100000001';
+    const doc1Id = '200000111';
+    const doc2Id = '200000122';
     const patient1Id = '100000009';
     const patient2Id = '100000017';
 
     const users = [
       // id, uuid, full_name, email, password, role, national_id_hash
-      [1, uuidv4(), 'Admin User',      'admin@clinic-app.com',    adminPass,   'admin',   ''],
-      [2, uuidv4(), 'Dr. Sara Cohen',  'sara@clinic-app.com',     doctorPass,  'doctor',  ''],
-      [3, uuidv4(), 'Dr. Yoni Levi',   'yoni@clinic-app.com',     doctorPass,  'doctor',  ''],
+      [1, uuidv4(), 'Admin User',      'admin@clinic-app.com',    adminPass,   'admin',   hashId(adminId)],
+      [2, uuidv4(), 'Dr. Sara Cohen',  'sara@clinic-app.com',     doctorPass,  'doctor',  hashId(doc1Id)],
+      [3, uuidv4(), 'Dr. Yoni Levi',   'yoni@clinic-app.com',     doctorPass,  'doctor',  hashId(doc2Id)],
       [4, uuidv4(), 'Moshe Israeli',   'moshe@clinic-app.com',    patientPass, 'patient', hashId(patient1Id)],
       [5, uuidv4(), 'Tamar Katz',      'tamar@clinic-app.com',    patientPass, 'patient', hashId(patient2Id)],
     ];
@@ -86,11 +88,11 @@ const seed = async () => {
     await conn.commit();
     console.log('✅ Seed completed successfully!');
     console.log('\n📋 Login credentials:');
-    console.log('  Admin:    admin@clinic-app.com   / Admin123!');
-    console.log('  Doctor 1: sara@clinic-app.com    / Doctor123!');
-    console.log('  Doctor 2: yoni@clinic-app.com    / Doctor123!');
-    console.log('  Patient 1: moshe@clinic-app.com  / Patient123!  / ID 100000009');
-    console.log('  Patient 2: tamar@clinic-app.com  / Patient123!  / ID 100000017');
+    console.log(`  Admin:    admin@clinic-app.com   / Admin123!  (national ID: ${adminId})`);
+    console.log(`  Doctor 1: sara@clinic-app.com    / Doctor123!  (national ID: ${doc1Id})`);
+    console.log(`  Doctor 2: yoni@clinic.app    / Doctor123!  (national ID: ${doc2Id})`);
+    console.log(`  Patient 1: moshe@clinic.app  / Patient123!  / ID ${patient1Id}`);
+    console.log(`  Patient 2: tamar@clinic.app  / Patient123!  / ID ${patient2Id}`);
   } catch (err) {
     await conn.rollback();
     console.error('❌ Seed failed:', err.message);

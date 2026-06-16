@@ -4,7 +4,7 @@ import BookingWizard   from '../../components/appointments/BookingWizard';
 import './AppointmentCalendar.css';
 import { useAuthContext } from '../../context/AuthContext';
 import useFetch from '../../hooks/useFetch';
-import { getPatientAppointments, updateAppointmentStatus } from '../../services/appointments.service';
+import { getPatientAppointments, getAppointmentsByDoctor, updateAppointmentStatus } from '../../services/appointments.service';
 
 const TABS = ['תורים עתידיים', 'היסטוריה', 'בקשות ממתינות'];
 
@@ -15,7 +15,10 @@ export default function AppointmentCalendar() {
   const [appointments, setAppointments] = useState([]);
 
   const { data, loading, error, refetch } = useFetch(
-    () => (user ? getPatientAppointments(user.id) : Promise.resolve([])),
+    () => {
+      if (!user) return Promise.resolve([]);
+      return user.role === 'doctor' ? getAppointmentsByDoctor(user.id) : getPatientAppointments(user.id);
+    },
     [user]
   );
 
