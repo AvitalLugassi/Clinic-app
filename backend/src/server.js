@@ -33,8 +33,10 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
+const server = http.createServer(app);
+initSocket(server);
+server.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-  await testConnection();   // בדיקת חיבור MySQL
-  await connectMongo();     // הפעלת חיבור MongoDB (הורדנו את ה- //)
+  await testConnection();
+  await connectMongo();
 });

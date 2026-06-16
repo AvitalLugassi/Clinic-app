@@ -43,10 +43,23 @@ const getPatientAppointments = async (patientId) => {
     return rows;
 };
 
+const getAppointmentsByDoctor = async (doctorId) => {
+    const query = `
+        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status,
+               u.full_name as patient_name
+        FROM appointments a
+        JOIN users u ON a.patient_id = u.id
+        WHERE a.doctor_id = ?
+        ORDER BY a.scheduled_at DESC
+    `;
+    const [rows] = await db.execute(query, [doctorId]);
+    return rows;
+};
+
 export default {
     getAvailableSlots,
     createAppointment,
     updateAppointmentStatus,
     getPatientAppointments,
-    getAppointmentsByDoctor
+    getAppointmentsByDoctor,
 };

@@ -27,7 +27,7 @@ const signAndSend = async (res, user) => {
 
   res.cookie('token', accessToken, { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 });
   res.cookie('refreshToken', newRefreshToken, { ...COOKIE_OPTS, maxAge: 7 * 24 * 60 * 60 * 1000 });
-  res.json({ id: user.id, role: user.role });
+  res.json({ id: user.id, role: user.role, user_uuid: user.user_uuid });
 };
 
 export const refreshToken = async (req, res) => {
@@ -210,7 +210,7 @@ export const patientLogin = async (req, res) => {
   if (!id_number || !password) return res.status(400).json({ message: 'Missing fields' });
 
   const [rows] = await pool.query(
-    'SELECT id, password_hash, role, is_active, is_app_registered FROM users WHERE national_id_hash = ? AND role = ?',
+    'SELECT id, user_uuid, password_hash, role, is_active, is_app_registered FROM users WHERE national_id_hash = ? AND role = ?',
     [hashId(id_number), 'patient']
   );
   const user = rows[0];
@@ -230,7 +230,7 @@ export const staffLogin = async (req, res) => {
     return res.status(401).json({ message: 'מייל שגוי או סיסמה שגויה' });
 
   const [rows] = await pool.query(
-    "SELECT id, password_hash, role, is_active, is_app_registered FROM users WHERE email = ? AND role IN ('doctor', 'admin')",
+    "SELECT id, user_uuid, password_hash, role, is_active, is_app_registered FROM users WHERE email = ? AND role IN ('doctor', 'admin')",
     [email]
   );
   const user = rows[0];
