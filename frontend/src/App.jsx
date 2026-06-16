@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { useAuthContext } from './context/AuthContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Login from './pages/Login/Login';
@@ -15,13 +16,19 @@ import DoctorActivate from './pages/DoctorActivate/DoctorActivate';
 import MyPrescriptions from './pages/MyPrescriptions/MyPrescriptions';
 
 const ROLE_ROUTES = [
-  { path: 'dashboard',          element: <Dashboard />,          roles: ['patient', 'doctor', 'admin'] },
-  { path: 'appointments', element: <AppointmentCalendar />, roles: ['patient', 'doctor'] },
-  { path: 'records',            element: <MedicalRecord />,       roles: ['patient', 'doctor'] },
-  { path: 'profile',            element: <PatientProfile />,      roles: ['patient'] },
-  { path: 'prescriptions',      element: <MyPrescriptions />,     roles: ['patient'] },
-  { path: 'reports',            element: <Reports />,             roles: ['admin'] },
+  { path: ':uuid/dashboard',     element: <Dashboard />,          roles: ['patient', 'doctor', 'admin'] },
+  { path: ':uuid/appointments',  element: <AppointmentCalendar />, roles: ['patient', 'doctor'] },
+  { path: ':uuid/records',       element: <MedicalRecord />,       roles: ['patient', 'doctor'] },
+  { path: ':uuid/profile',       element: <PatientProfile />,      roles: ['patient'] },
+  { path: ':uuid/prescriptions', element: <MyPrescriptions />,     roles: ['patient'] },
+  { path: ':uuid/reports',       element: <Reports />,             roles: ['admin'] },
 ];
+
+function UuidRedirect() {
+  const { user } = useAuthContext();
+  if (!user) return <Navigate to="/login" replace />;
+  return <Navigate to={`/${user.user_uuid}/dashboard`} replace />;
+}
 
 function AppRoutes() {
   return (
@@ -32,7 +39,7 @@ function AppRoutes() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<UuidRedirect />} />
           {ROLE_ROUTES.map(({ path, element, roles }) => (
             <Route key={path} path={`/${path}`} element={
               <ProtectedRoute roles={roles}>{element}</ProtectedRoute>

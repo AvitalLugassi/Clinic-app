@@ -1,4 +1,4 @@
-import db from '../config/db.js';
+import db from '../config/db.mysql.js';
 
 const getAvailableSlots = async (doctorId, date) => {
     const query = `
@@ -31,7 +31,7 @@ const updateAppointmentStatus = async (appointmentId, status) => {
 
 const getPatientAppointments = async (patientId) => {
     const query = `
-        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status, u.name as doctor_name
+        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status, u.full_name as doctor_name
         FROM appointments a
         JOIN users u ON a.doctor_id = u.id
         WHERE a.patient_id = ?
@@ -41,9 +41,23 @@ const getPatientAppointments = async (patientId) => {
     return rows;
 };
 
+const getAppointmentsByDoctor = async (doctorId) => {
+    const [rows] = await db.execute(
+        `SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status,
+                u.full_name AS patient_name
+         FROM appointments a
+         JOIN users u ON u.id = a.patient_id
+         WHERE a.doctor_id = ?
+         ORDER BY a.scheduled_at ASC`,
+        [doctorId]
+    );
+    return rows;
+};
+
 export default {
     getAvailableSlots,
     createAppointment,
     updateAppointmentStatus,
-    getPatientAppointments
+    getPatientAppointments,
+    getAppointmentsByDoctor
 };

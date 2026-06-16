@@ -1,3 +1,4 @@
+import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -10,7 +11,8 @@ import prescriptionRoutes from './routes/prescriptions.routes.js';
 import { logger } from './middleware/logger.middleware.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { testConnection } from './config/db.mysql.js';
-import connectMongo from './config/db.mongo.js'; // הורדנו את ה- //
+import connectMongo from './config/db.mongo.js';
+import { initSocket } from './config/socket.js';
 
 dotenv.config();
 const app = express();
@@ -34,8 +36,11 @@ app.use('/api/prescriptions', prescriptionRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
+const httpServer = http.createServer(app);
+initSocket(httpServer);
+
+httpServer.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-  await testConnection();   // בדיקת חיבור MySQL
-  await connectMongo();     // הפעלת חיבור MongoDB (הורדנו את ה- //)
+  await testConnection();
+  await connectMongo();
 });

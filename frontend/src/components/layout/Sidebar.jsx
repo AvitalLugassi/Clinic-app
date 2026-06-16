@@ -1,32 +1,30 @@
 import { NavLink } from 'react-router-dom';
+import { useAuthContext } from '../../context/AuthContext';
 import './Sidebar.css';
 
-const links = {
+const getLinks = (uuid) => ({
   admin: [
-    { to: '/dashboard', label: '📊 Dashboard' },
-    { to: '/patients', label: '🧑‍⚕️ Patients' },
-    { to: '/doctors', label: '👨‍⚕️ Doctors' },
-    { to: '/appointments', label: '📅 Appointments' },
-    { to: '/reports', label: '📈 Reports' },
+
+    { to: `/${uuid}/dashboard`, label: '📊 Dashboard' },
+    { to: `/${uuid}/reports`,   label: '📈 Reports' },
   ],
   doctor: [
-    { to: '/dashboard', label: '📊 Dashboard' },
-    { to: '/appointments', label: '📅 Appointments' },
-    { to: '/patients', label: '🧑‍⚕️ My Patients' },
-    { to: '/records', label: '📋 Medical Records' },
-    { to: '/prescriptions', label: '💊 Prescriptions' },
+    { to: `/${uuid}/dashboard`,    label: '📊 Dashboard' },
+    { to: `/${uuid}/appointments`, label: '📅 Appointments' },
+    { to: `/${uuid}/records`,      label: '📋 Medical Records' },
   ],
   patient: [
-    { to: '/dashboard', label: '📊 Dashboard' },
-    { to: '/appointments', label: '📅 Book Appointment' },
-    { to: '/records', label: '📋 My Records' },
-    { to: '/prescriptions', label: '💊 My Prescriptions' },
-    { to: '/profile', label: '👤 Profile' },
+    { to: `/${uuid}/dashboard`,     label: '📊 Dashboard' },
+    { to: `/${uuid}/appointments`,  label: '📅 Book Appointment' },
+    { to: `/${uuid}/records`,       label: '📋 My Records' },
+    { to: `/${uuid}/prescriptions`, label: '💊 My Prescriptions' },
+    { to: `/${uuid}/profile`,       label: '👤 Profile' },
   ],
-};
+});
 
 export default function Sidebar({ role }) {
-  const navLinks = links[role] || [];
+  const { user } = useAuthContext();
+  const navLinks = getLinks(user?.user_uuid)[role] || [];
 
   return (
     <aside className="sidebar">

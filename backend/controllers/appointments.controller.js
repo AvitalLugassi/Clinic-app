@@ -1,7 +1,6 @@
-
-import appointmentsService from '../services/appointments.service.js'; 
-const { CLINIC_START_TIME, CLINIC_END_TIME, SLOT_DURATION_MINUTES } = require('../config/clinic.config');
-const { v4: uuidv4 } = require('uuid');
+import appointmentsService from '../services/appointments.service.js';
+import { CLINIC_START_TIME, CLINIC_END_TIME, SLOT_DURATION_MINUTES } from '../config/clinic.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const createAppointment = async (req, res) => {
     try {

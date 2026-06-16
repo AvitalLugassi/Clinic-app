@@ -14,7 +14,7 @@ export default function useSocket(user, onEvent) {
     const socket = socketRef.current;
 
     socket.on('connect', () => {
-      socket.emit('join', user._id);
+    socket.emit('join', user.id);
     });
 
     if (onEvent) {
