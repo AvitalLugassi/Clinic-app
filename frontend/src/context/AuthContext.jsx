@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     getMe()
-      .then((res) => setUser(res.data))
+      .then((data) => setUser(data))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
@@ -17,15 +17,15 @@ export function AuthProvider({ children }) {
   const loginPatient = async (credentials) => {
     await patientLogin(credentials);
     const me = await getMe();
-    setUser(me.data);
-    return me.data;
+    setUser(me);
+    return me;
   };
 
   const loginStaff = async (credentials) => {
     await staffLogin(credentials);
     const me = await getMe();
-    setUser(me.data);
-    return me.data;
+    setUser(me);
+    return me;
   };
 
   const logout = async () => {

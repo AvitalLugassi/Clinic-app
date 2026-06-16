@@ -12,12 +12,14 @@ import PatientProfile from './pages/PatientProfile/PatientProfile';
 import Reports from './pages/Reports/Reports';
 import NotFound from './pages/NotFound/NotFound';
 import DoctorActivate from './pages/DoctorActivate/DoctorActivate';
+import MyPrescriptions from './pages/MyPrescriptions/MyPrescriptions';
 
 const ROLE_ROUTES = [
   { path: 'dashboard',          element: <Dashboard />,          roles: ['patient', 'doctor', 'admin'] },
   { path: 'appointments', element: <AppointmentCalendar />, roles: ['patient', 'doctor'] },
   { path: 'records',            element: <MedicalRecord />,       roles: ['patient', 'doctor'] },
   { path: 'profile',            element: <PatientProfile />,      roles: ['patient'] },
+  { path: 'prescriptions',      element: <MyPrescriptions />,     roles: ['patient'] },
   { path: 'reports',            element: <Reports />,             roles: ['admin'] },
 ];
 

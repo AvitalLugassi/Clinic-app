@@ -10,7 +10,7 @@ export default function useFetch(fetchFn, deps = []) {
     setError(null);
     try {
       const res = await fetchFn();
-      setData(res.data);
+      setData(res);
     } catch (err) {
       setError(err.response?.data?.message ?? 'Failed to load');
     } finally {

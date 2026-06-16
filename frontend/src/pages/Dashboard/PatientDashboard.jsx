@@ -1,6 +1,4 @@
 import './PatientDashboard.css';
-import WelcomeBanner     from '../../components/patients/WelcomeBanner';
-import ProfileSnapshot   from '../../components/patients/ProfileSnapshot';
 import BookingWizard     from '../../components/appointments/BookingWizard';
 import AppointmentsList  from '../../components/patients/AppointmentsList';
 import PrescriptionsList from '../../components/patients/PrescriptionsList';

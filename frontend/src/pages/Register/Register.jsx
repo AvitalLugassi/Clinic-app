@@ -26,7 +26,7 @@ export default function Register() {
     try {
       const res = await patientPreRegister({ id_number: step1Form.form.id_number });
       setIdNumber(step1Form.form.id_number);
-      setMaskedEmail(res.data.email);
+      setMaskedEmail(res.email);
       setStep(2);
     } catch (err) {
       setError(err.response?.data?.message || 'שגיאה, נסה שוב');

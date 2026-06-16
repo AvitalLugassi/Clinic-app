@@ -4,7 +4,12 @@ import api from './api';
  * שליפת הפרופיל האישי של המטופל הנוכחי (מתוך ה-SQL)
  * @param {number} id - מזהה המטופל
  */
-export const getPatientProfile = async (id) => {
+export const getMyDashboard = async () => {
+  const response = await api.get('/patients/me/dashboard');
+  return response.data;
+};
+
+export const getPatientById = async (id) => {
   const response = await api.get(`/patients/${id}`);
   return response.data;
 };
