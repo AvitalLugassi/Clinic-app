@@ -33,6 +33,6 @@ export const getDoctorById = async (id) => {
  * @param {Object} filters - מסננים אופציונליים כמו שם או התמחות
  */
 export const getAllDoctors = async (filters = {}) => {
-  const response = await api.get('/doctors/all', { params: filters });
+  const response = await api.get('/doctors', { params: filters });
   return response.data;
 };

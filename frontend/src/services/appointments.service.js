@@ -46,7 +46,7 @@ export const updateAppointmentStatus = async (id, status) => {
  */
 export const getDoctorAvailability = async (doctorId, date) => {
   const response = await api.get('/appointments/available-slots', {
-    params: { doctorId, date }
+    params: { doctor_id: doctorId, date }
   });
   return response.data;
 };

@@ -8,10 +8,11 @@ import { sendRegistrationOtp, sendStaffActivationOtp } from '../services/email.s
 const STAFF_EMAIL_DOMAIN = '@clinic-app.com';
 const hashId = (id) => crypto.createHash('sha256').update(id).digest('hex');
 
+const isProd = process.env.NODE_ENV === 'production';
 const COOKIE_OPTS = {
   httpOnly: true,
-  sameSite: 'lax',
-  secure: false,
+  sameSite: isProd ? 'none' : 'lax',
+  secure: isProd,
 };
 
 const signAndSend = async (res, user) => {

@@ -40,19 +40,9 @@ export default function AppointmentCalendar() {
     }
   };
 
-  const handleBook = (booking) => {
-    // כרגע הפונקציה יוצרת תור מקומי בלבד;
-    // ניתן להרחיב אותה בעתיד לקריאה לשרת עם patient_id, doctor_id ו-scheduled_at.
-    const newAppt = {
-      id:           Date.now(),
-      doctor_name:  booking.doctor.name,
-      doctor_id:    booking.doctor.id,
-      department:   booking.doctor.department,
-      scheduled_at: new Date().toISOString(),
-      status:       'pending',
-    };
-    setAppointments((prev) => [newAppt, ...prev]);
+  const handleBook = () => {
     setShowWizard(false);
+    refetch();
   };
 
   return (
