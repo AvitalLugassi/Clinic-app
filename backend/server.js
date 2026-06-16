@@ -4,6 +4,9 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes.js';
 import patientRoutes from './routes/patients.routes.js';
+import appointmentRoutes from './routes/appointments.routes.js';
+import doctorRoutes from './routes/doctors.routes.js';
+import prescriptionRoutes from './routes/prescriptions.routes.js';
 import { logger } from './middleware/logger.middleware.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { testConnection } from './config/db.mysql.js';
@@ -24,6 +27,9 @@ app.use(logger);
 // רישום הראוטים במערכת
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
 
 app.use(errorHandler);
 

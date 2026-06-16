@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import { useAuthContext } from './AuthContext';
 import useSocket from '../hooks/useSocket';
+import Toast from '../components/ui/Toast/Toast';
 
 const NotificationContext = createContext(null);
 
@@ -28,6 +29,11 @@ export function NotificationProvider({ children }) {
   return (
     <NotificationContext.Provider value={{ notifications, toasts, addToast, clearNotifications, dismissToast }}>
       {children}
+      <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', zIndex: 9999 }}>
+        {toasts.map((t) => (
+          <Toast key={t.id} message={t.message} type={t.type} onClose={() => dismissToast(t.id)} />
+        ))}
+      </div>
     </NotificationContext.Provider>
   );
 }
