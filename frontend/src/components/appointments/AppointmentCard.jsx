@@ -8,11 +8,12 @@ function buildGoogleCalendarUrl(appt) {
   const start = new Date(appt.scheduled_at);
   const end = new Date(start.getTime() + 30 * 60000);
   const fmt = (d) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const title = appt.doctor_name ? `תור אצל ${appt.doctor_name}` : `תור עם ${appt.patient_name}`;
   const params = new URLSearchParams({
     action: 'TEMPLATE',
-    text: `תור אצל ${appt.doctor_name}`,
+    text: title,
     dates: `${fmt(start)}/${fmt(end)}`,
-    details: appt.department,
+    details: appt.department || appt.notes || '',
   });
   return `https://calendar.google.com/calendar/render?${params}`;
 }
@@ -20,7 +21,20 @@ function buildGoogleCalendarUrl(appt) {
 export default function AppointmentCard({ appointment, onCancel }) {
   const { user } = useAuthContext();
   const [showRx, setShowRx] = useState(false);
-  const { id, doctor_name, doctor_id, department, scheduled_at, status, patient_id } = appointment;
+  const {
+    id,
+    doctor_name,
+    doctor_id,
+    department,
+    scheduled_at,
+    status,
+    patient_name,
+    patient_id,
+  } = appointment;
+
+  const isPatientView = !!doctor_name;
+  const personName = isPatientView ? doctor_name : patient_name;
+  const personId = isPatientView ? doctor_id : patient_id;
 
   const date = new Date(scheduled_at);
   const dateStr = date.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -33,12 +47,12 @@ export default function AppointmentCard({ appointment, onCancel }) {
     <div className="appt-card">
       <div className="appt-card__header">
         <img
-          src={`https://i.pravatar.cc/150?img=${doctor_id ?? 10}`}
-          alt={doctor_name}
+          src={`https://i.pravatar.cc/150?img=${personId ?? 10}`}
+          alt={personName}
           className="appt-card__avatar"
         />
         <div className="appt-card__doctor-info">
-          <span className="appt-card__doctor-name">ד"ר {doctor_name}</span>
+          <span className="appt-card__doctor-name">{isPatientView ? `ד"ר ${personName}` : personName}</span>
           <span className="appt-card__department">{department}</span>
         </div>
         <StatusBadge status={status} />

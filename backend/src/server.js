@@ -34,9 +34,38 @@ app.use('/api/prescriptions', prescriptionRoutes);
 
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
-initSocket(server);
-server.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-  await testConnection();
-  await connectMongo();
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err && err.stack ? err.stack : err);
 });
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error(`EADDRINUSE: Port ${PORT} is already in use.`, err);
+  } else {
+    console.error('Server error:', err);
+  }
+});
+
+const start = async () => {
+  try {
+    // Ensure DB connections are healthy before starting to listen
+    await testConnection();
+    await connectMongo();
+    // attach sockets after DB is ready
+    initSocket(server);
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server due to initialization error:', err && err.stack ? err.stack : err);
+    process.exit(1);
+  }
+};
+
+start();

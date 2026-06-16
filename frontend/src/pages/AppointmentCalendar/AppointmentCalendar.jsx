@@ -17,8 +17,7 @@ export default function AppointmentCalendar() {
   const { data, loading, error, refetch } = useFetch(
     () => {
       if (!user) return Promise.resolve([]);
-      if (user.role === 'doctor') return getAppointmentsByDoctor(user.id);
-      return getPatientAppointments(user.id);
+      return user.role === 'doctor' ? getAppointmentsByDoctor(user.id) : getPatientAppointments(user.id);
     },
     [user]
   );

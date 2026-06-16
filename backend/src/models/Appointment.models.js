@@ -31,7 +31,8 @@ const updateAppointmentStatus = async (appointmentId, status) => {
 
 const getPatientAppointments = async (patientId) => {
     const query = `
-        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status, u.full_name as doctor_name
+        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status, a.notes, a.doctor_id,
+               u.full_name as doctor_name, d.specialty, dep.name as department
         FROM appointments a
         JOIN users u ON a.doctor_id = u.id
         JOIN doctors d ON d.user_id = u.id
