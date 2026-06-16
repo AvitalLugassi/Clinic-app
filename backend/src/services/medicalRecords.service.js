@@ -1,6 +1,6 @@
-import medicalRecord from '../models/medicalRecord.model.js'; // חובה להוסיף סיומת .js בשיטה החדשה
+import medicalRecord from '../models/medicalRecord.models.js'; // חובה להוסיף סיומת .js בשיטה החדשה
 
-export const createmedicalRecord = async (recordData) => {
+export const createMedicalRecord = async (recordData) => {
     const newRecord = new medicalRecord(recordData);
     return await newRecord.save();
 };
