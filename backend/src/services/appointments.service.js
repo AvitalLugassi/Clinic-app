@@ -20,10 +20,16 @@ const getDoctorAppointments = async (doctorId) => {
     return await appointmentsModel.getAppointmentsByDoctor(doctorId);
 };
 
+// Backwards-compatible alias in case other modules import a different name
+const getAppointmentsByDoctor = async (doctorId) => {
+    return await appointmentsModel.getAppointmentsByDoctor(doctorId);
+};
+
 export default {
     getAvailableSlots,
     createAppointment,
     updateAppointmentStatus,
     getPatientAppointments,
-    getDoctorAppointments
+    getDoctorAppointments,
+    getAppointmentsByDoctor
 };

@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import StatusBadge from './StatusBadge';
+import PrescriptionForm from '../prescriptions/PrescriptionForm';
 import './AppointmentCard.css';
+import { useAuthContext } from '../../context/AuthContext';
 
 function buildGoogleCalendarUrl(appt) {
   const start = new Date(appt.scheduled_at);
@@ -15,7 +18,9 @@ function buildGoogleCalendarUrl(appt) {
 }
 
 export default function AppointmentCard({ appointment, onCancel }) {
-  const { id, doctor_name, doctor_id, department, scheduled_at, status } = appointment;
+  const { user } = useAuthContext();
+  const [showRx, setShowRx] = useState(false);
+  const { id, doctor_name, doctor_id, department, scheduled_at, status, patient_id } = appointment;
 
   const date = new Date(scheduled_at);
   const dateStr = date.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -53,6 +58,11 @@ export default function AppointmentCard({ appointment, onCancel }) {
             ביטול תור
           </button>
         )}
+        {user?.role === 'doctor' && (
+          <button className="appt-card__btn" onClick={() => setShowRx((v) => !v)}>
+            💊 {showRx ? 'סגור מרשם' : 'כתוב מרשם'}
+          </button>
+        )}
         {isFuture && (
           <a
             href={buildGoogleCalendarUrl(appointment)}
@@ -64,6 +74,12 @@ export default function AppointmentCard({ appointment, onCancel }) {
           </a>
         )}
       </div>
+      {showRx && (
+        <PrescriptionForm
+          patientId={patient_id}
+          onClose={() => setShowRx(false)}
+        />
+      )}
     </div>
   );
 }

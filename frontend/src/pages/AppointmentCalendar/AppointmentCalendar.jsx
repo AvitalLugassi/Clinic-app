@@ -4,7 +4,7 @@ import BookingWizard   from '../../components/appointments/BookingWizard';
 import './AppointmentCalendar.css';
 import { useAuthContext } from '../../context/AuthContext';
 import useFetch from '../../hooks/useFetch';
-import { getPatientAppointments, updateAppointmentStatus } from '../../services/appointments.service';
+import { getPatientAppointments, getAppointmentsByDoctor, updateAppointmentStatus } from '../../services/appointments.service';
 
 const TABS = ['תורים עתידיים', 'היסטוריה', 'בקשות ממתינות'];
 
@@ -15,7 +15,11 @@ export default function AppointmentCalendar() {
   const [appointments, setAppointments] = useState([]);
 
   const { data, loading, error, refetch } = useFetch(
-    () => (user ? getPatientAppointments(user.id) : Promise.resolve([])),
+    () => {
+      if (!user) return Promise.resolve([]);
+      if (user.role === 'doctor') return getAppointmentsByDoctor(user.id);
+      return getPatientAppointments(user.id);
+    },
     [user]
   );
 
@@ -45,16 +49,20 @@ export default function AppointmentCalendar() {
     refetch();
   };
 
+  const canBook = user?.role !== 'doctor';
+
   return (
     <div className="appt-calendar">
       <div className="appt-calendar__header">
         <div>
-          <h1 className="appt-calendar__title">התורים שלי</h1>
+          <h1 className="appt-calendar__title">{user?.role === 'doctor' ? 'תורים שהמטופלים קבעו לי' : 'התורים שלי'}</h1>
           <p className="appt-calendar__subtitle">{future.length} תורים קרובים</p>
         </div>
-        <button className="appt-calendar__new-btn" onClick={() => setShowWizard(!showWizard)}>
-          {showWizard ? '✕ סגור' : '＋ קביעת תור חדש'}
-        </button>
+        {canBook && (
+          <button className="appt-calendar__new-btn" onClick={() => setShowWizard(!showWizard)}>
+            {showWizard ? '✕ סגור' : '＋ קביעת תור חדש'}
+          </button>
+        )}
       </div>
 
       {showWizard && (

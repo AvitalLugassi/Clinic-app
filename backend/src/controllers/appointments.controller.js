@@ -11,6 +11,15 @@ const createAppointment = async (req, res) => {
             return res.status(400).json({ message: "כל שדות החובה חייבים להיות מלאים" });
         }
 
+        // Authorization rules:
+        // - Patients can create appointments for themselves only
+        // - Admins can create appointments for any patient
+        // - Doctors are NOT allowed to create appointments (they only receive appointments from patients or admins)
+        const actor = req.user;
+        if (!actor) return res.status(401).json({ message: 'Unauthorized' });
+        if (actor.role === 'doctor') return res.status(403).json({ message: 'Forbidden' });
+        if (actor.role === 'patient' && Number(actor.id) !== Number(patient_id)) return res.status(403).json({ message: 'Forbidden' });
+
         const appointment_uuid = uuidv4();
         const status = 'pending';
         const insertId = await appointmentsService.createAppointment(
@@ -90,11 +99,14 @@ const updateAppointmentStatus = async (req, res) => {
 const getPatientAppointments = async (req, res) => {
     try {
         // הערה: בשלב מתקדם ה-patient_id יגיע מה-Token (req.user.id), כרגע נביא אותו משרשור ה-Query לצורך בדיקה
-        const { patient_id } = req.query; 
+        const { patient_id } = req.query;
+        if (!patient_id) return res.status(400).json({ message: "מזהה מטופל הוא שדה חובה" });
 
-        if (!patient_id) {
-            return res.status(400).json({ message: "מזהה מטופל הוא שדה חובה" });
-        }
+        // Only the patient themself or an admin can fetch patient appointments
+        const actor = req.user;
+        if (!actor) return res.status(401).json({ message: 'Unauthorized' });
+        if (actor.role === 'patient' && Number(actor.id) !== Number(patient_id)) return res.status(403).json({ message: 'Forbidden' });
+        if (actor.role === 'doctor') return res.status(403).json({ message: 'Forbidden' });
 
         const appointments = await appointmentsService.getPatientAppointments(patient_id);
         return res.status(200).json(appointments);
@@ -111,6 +123,11 @@ try {
         if (!doctor_id) {
             return res.status(400).json({ message: "מזהה רופא הוא שדה חובה" });
         }
+
+        // Only the doctor themself or an admin can fetch doctor appointments
+        const actor = req.user;
+        if (!actor) return res.status(401).json({ message: 'Unauthorized' });
+        if (actor.role === 'doctor' && Number(actor.id) !== Number(doctor_id)) return res.status(403).json({ message: 'Forbidden' });
 
         const appointments = await appointmentsService.getAppointmentsByDoctor(doctor_id);
         return res.status(200).json(appointments);

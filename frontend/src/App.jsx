@@ -6,6 +6,7 @@ import ProtectedRoute from './components/layout/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
+import Landing from './pages/Landing/Landing';
 import Dashboard from './pages/Dashboard/Dashboard';
 import AppointmentCalendar from './pages/AppointmentCalendar/AppointmentCalendar';
 import MedicalRecord from './pages/MedicalRecord/MedicalRecord';
@@ -30,6 +31,12 @@ function UuidRedirect() {
   return <Navigate to={`/${user.user_uuid}/dashboard`} replace />;
 }
 
+function LandingRedirect() {
+  const { user } = useAuthContext();
+  if (user) return <Navigate to={`/${user.user_uuid}/dashboard`} replace />;
+  return <Landing />;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -37,9 +44,11 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/doctor-activate" element={<DoctorActivate />} />
 
+      <Route path="/" element={<LandingRedirect />} />
+
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
-          <Route path="/" element={<UuidRedirect />} />
+          <Route path="/home" element={<UuidRedirect />} />
           {ROLE_ROUTES.map(({ path, element, roles }) => (
             <Route key={path} path={`/${path}`} element={
               <ProtectedRoute roles={roles}>{element}</ProtectedRoute>

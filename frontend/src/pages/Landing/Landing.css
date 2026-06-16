@@ -1,0 +1,13 @@
+.landing-root { font-family: sans-serif; color: #222; }
+.landing-hero { background: linear-gradient(90deg,#4f46e5,#06b6d4); color: #fff; padding: 60px 0; text-align: center; }
+.landing-inner { max-width: 900px; margin: 0 auto; }
+.landing-cta { margin-top: 20px; }
+.btn-primary { background:#fff; color:#111; padding:10px 18px; border-radius:6px; margin:0 8px; text-decoration:none; }
+.btn-outline { border:1px solid #fff; color:#fff; padding:10px 18px; border-radius:6px; margin:0 8px; text-decoration:none; }
+.landing-about { padding:40px 20px; text-align:center; }
+.landing-doctors { padding:20px; background:#f7fafc; }
+.container { max-width:1000px; margin:0 auto; }
+.doctors-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:20px; }
+.doctor-card { background:#fff; padding:16px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); text-align:center; }
+.doctor-avatar { width:72px; height:72px; border-radius:50%; background:#e2e8f0; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.landing-footer { padding:16px; text-align:center; font-size:14px; color:#666; }

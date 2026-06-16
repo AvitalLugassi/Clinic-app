@@ -28,6 +28,7 @@ export default function BookingWizard({ onBook, onClose }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [adminPatientId, setAdminPatientId] = useState('');
 
   useEffect(() => {
     getAllDoctors()
@@ -35,6 +36,13 @@ export default function BookingWizard({ onBook, onClose }) {
       .catch(() => setError('שגיאה בטעינת הרופאים'))
       .finally(() => setLoadingDoctors(false));
   }, []);
+
+  // Prevent doctors from booking — they should only view appointments
+  useEffect(() => {
+    if (user?.role === 'doctor') {
+      setError('רופאים אינם מורשים לקבוע תורים');
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!selectedDoctor || !selectedDate) return;
@@ -59,10 +67,15 @@ export default function BookingWizard({ onBook, onClose }) {
     setSubmitting(true);
     try {
       const scheduled_at = `${selectedDate} ${selectedSlot}:00`;
-      await createAppointment({ patient_id: user.id, doctor_id: selectedDoctor.id, scheduled_at });
+      let patient_id = user.id;
+      if (user.role === 'admin') {
+        if (!adminPatientId) throw new Error('יש להזין מזהה מטופל');
+        patient_id = Number(adminPatientId);
+      }
+      await createAppointment({ patient_id, doctor_id: selectedDoctor.id, scheduled_at });
       onBook?.();
     } catch (err) {
-      setError(err.response?.data?.message || 'שגיאה בקביעת התור');
+      setError(err.response?.data?.message || err.message || 'שגיאה בקביעת התור');
     } finally {
       setSubmitting(false);
     }
@@ -84,12 +97,22 @@ export default function BookingWizard({ onBook, onClose }) {
 
         {step === 0 && (
           <div className="wizard__panel">
-            <input
-              className="wizard__search"
-              placeholder="חפש רופא או מחלקה..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setSelectedDept(null); }}
-            />
+            <p className="wizard__subtitle">בחר רופא</p>
+              {user?.role === 'admin' && (
+              <div style={{ margin: '0.5rem 0' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.25rem' }}>מזהה מטופל (ID)</label>
+                <input value={adminPatientId} onChange={(e) => setAdminPatientId(e.target.value)} placeholder="הכנס מזהה מספרי" />
+              </div>
+            )}
+
+            <div className="wizard__search" style={{ margin: '0.5rem 0' }}>
+              <input
+                placeholder="חפש רופא או מחלקה..."
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setSelectedDept(null); }}
+              />
+            </div>
+
             {!search && (
               <div className="wizard__dept-grid">
                 {departments.map((d) => (
@@ -101,6 +124,7 @@ export default function BookingWizard({ onBook, onClose }) {
                 ))}
               </div>
             )}
+
             {loadingDoctors ? (
               <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>טוען רופאים...</p>
             ) : filteredDoctors.length === 0 ? (

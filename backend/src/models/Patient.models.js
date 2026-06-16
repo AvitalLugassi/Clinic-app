@@ -2,7 +2,7 @@ import pool from '../config/db.mysql.js';
 
 export const getPatientDashboard = async (userId) => {
   const [[patient]] = await pool.query(
-    `SELECT u.id, u.full_name, u.email, u.phone,
+    `SELECT u.id AS user_id, p.id, u.full_name, u.email, u.phone,
             p.date_of_birth, p.blood_type, p.allergies,
             p.address, p.emergency_contact_name, p.emergency_contact_phone
      FROM users u
