@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes.js';
 import patientRoutes from './routes/patients.routes.js';
+import { logger } from './middleware/logger.middleware.js';
+import { errorHandler } from './middleware/error.middleware.js';
 import { testConnection } from './config/db.mysql.js';
 import connectMongo from './config/db.mongo.js'; // הורדנו את ה- //
 
@@ -17,10 +19,13 @@ process.on('unhandledRejection', (err) => {
 });
 app.use(express.json());
 app.use(cookieParser());
+app.use(logger);
 
 // רישום הראוטים במערכת
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
