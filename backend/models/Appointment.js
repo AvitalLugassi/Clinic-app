@@ -1,4 +1,4 @@
-const db = require('../config/db');
+import db from '../config/db.js';
 
 const getAvailableSlots = async (doctorId, date) => {
     const query = `
@@ -41,7 +41,7 @@ const getPatientAppointments = async (patientId) => {
     return rows;
 };
 
-module.exports = {
+export default {
     getAvailableSlots,
     createAppointment,
     updateAppointmentStatus,

@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import appointmentsController from '../controllers/appointments.controller.js';
+import { protect } from '../middleware/auth.middleware.js'; // הוספנו את ה-Middleware של האימות 
+
 const router = express.Router();
-const appointmentsController = require('../controllers/appointments.controller');
-// כאן בהמשך תוכלי לשלב את ה-Middleware של ה-Auth כדי להגן על הנתיבים
-const { protect } = require('../middlewares/auth.middleware'); 
 
 router.post('/', appointmentsController.createAppointment);
 
@@ -12,4 +12,6 @@ router.get('/available-slots', appointmentsController.getDoctorAvailability);
 
 router.get('/patient-appointments', appointmentsController.getPatientAppointments);
 
-module.exports = router;
+router.get('/doctor/:doctor_id', appointmentsController.getDoctorAppointments);
+
+export default router;

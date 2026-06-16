@@ -1,12 +1,10 @@
 import './PatientDashboard.css';
-import WelcomeBanner     from '../../components/patients/WelcomeBanner';
-import ProfileSnapshot   from '../../components/patients/ProfileSnapshot';
 import BookingWizard     from '../../components/appointments/BookingWizard';
 import AppointmentsList  from '../../components/patients/AppointmentsList';
 import PrescriptionsList from '../../components/patients/PrescriptionsList';
 import MedicalTimeline   from '../../components/patients/MedicalTimeline';
 import useFetch          from '../../hooks/useFetch';
-import { getMyDashboard } from '../../services/patients.service';
+// import { getMyDashboard } from '../../services/patients.service';
 
 export default function PatientDashboard() {
   const { data, loading, error } = useFetch(getMyDashboard);

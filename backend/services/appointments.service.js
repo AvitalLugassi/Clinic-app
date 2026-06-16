@@ -1,4 +1,4 @@
-const appointmentsModel = require('../models/appointments.model');
+import appointmentsModel from '../models/Appointment.js';
 
 const getAvailableSlots = async (doctorId, date) => {
     return await appointmentsModel.getAvailableSlots(doctorId, date);
@@ -16,9 +16,14 @@ const getPatientAppointments = async (patientId) => {
     return await appointmentsModel.getPatientAppointments(patientId);
 };
 
-module.exports = {
+const getDoctorAppointments = async (doctorId) => {
+    return await appointmentsModel.getAppointmentsByDoctor(doctorId);
+};
+
+export default {
     getAvailableSlots,
     createAppointment,
     updateAppointmentStatus,
-    getPatientAppointments
+    getPatientAppointments,
+    getDoctorAppointments
 };
