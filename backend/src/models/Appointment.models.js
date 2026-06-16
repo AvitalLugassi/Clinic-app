@@ -31,9 +31,7 @@ const updateAppointmentStatus = async (appointmentId, status) => {
 
 const getPatientAppointments = async (patientId) => {
     const query = `
-        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status,
-               u.full_name as doctor_name, u.id as doctor_id,
-               dep.name as department
+        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status, u.name as doctor_name
         FROM appointments a
         JOIN users u ON a.doctor_id = u.id
         JOIN doctors d ON d.user_id = u.id
@@ -42,19 +40,6 @@ const getPatientAppointments = async (patientId) => {
         ORDER BY a.scheduled_at DESC
     `;
     const [rows] = await db.execute(query, [patientId]);
-    return rows;
-};
-
-const getAppointmentsByDoctor = async (doctorId) => {
-    const query = `
-        SELECT a.id, a.appointment_uuid, a.scheduled_at, a.status,
-               u.full_name as patient_name
-        FROM appointments a
-        JOIN users u ON a.patient_id = u.id
-        WHERE a.doctor_id = ?
-        ORDER BY a.scheduled_at DESC
-    `;
-    const [rows] = await db.execute(query, [doctorId]);
     return rows;
 };
 

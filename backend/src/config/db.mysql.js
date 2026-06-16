@@ -15,9 +15,13 @@ const pool = mysql.createPool({
 });
 
 export const testConnection = async () => {
-  const conn = await pool.getConnection();
-  console.log('✅ MySQL connected');
-  conn.release();
+  try {
+    const conn = await pool.getConnection();
+    console.log('✅ MySQL connected');
+    conn.release();
+  } catch (err) {
+    console.error('❌ MySQL connection failed:', err.message);
+  }
 };
 
 export default pool;
