@@ -196,7 +196,7 @@ export const adminRegisterPatient = async (req, res) => {
 
   const user_uuid = uuidv4();
   const [result] = await pool.query(
-    'INSERT INTO users (user_uuid, full_name, email, national_id_hash, role, phone, is_active, is_app_registered, created_at) VALUES (?, ?, ?, ?, ?, ?, 1, 0, NOW())',
+    'INSERT INTO users (user_uuid, full_name, email, password_hash, national_id_hash, role, phone, is_active, is_app_registered, created_at) VALUES (?, ?, ?, NULL, ?, ?, ?, 1, 0, NOW())',
     [user_uuid, full_name, email, hashId(id_number), 'patient', phone || null]
   );
 
