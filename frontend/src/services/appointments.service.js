@@ -1,4 +1,3 @@
-
 import api from './api';
 
 /**
@@ -14,7 +13,7 @@ export const createAppointment = async (appointmentData) => {
  * שליפת כל התורים של פציינט ספציפי
  * @param {number} patientId 
  */
-export const getAppointmentsByPatient = async (patientId) => {
+export const getPatientAppointments = async (patientId) => {
   const response = await api.get(`/appointments/patient/${patientId}`);
   return response.data;
 };
@@ -43,7 +42,7 @@ export const updateAppointmentStatus = async (id, status) => {
  * @param {number} doctorId 
  * @param {string} date - פורמט YYYY-MM-DD
  */
-export const getAvailableSlots = async (doctorId, date) => {
+export const getDoctorAvailability = async (doctorId, date) => {
   const response = await api.get('/appointments/available-slots', {
     params: { doctorId, date }
   });
