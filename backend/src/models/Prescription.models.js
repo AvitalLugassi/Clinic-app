@@ -11,7 +11,7 @@ export const createPrescription = async ({ doctor_id, patient_id, medications, d
 
 export const getPatientPrescriptions = async (userId) => {
   const [rows] = await pool.query(
-    `SELECT pr.id, pr.prescription_uuid, pr.medications, pr.dosage,
+    `SELECT pr.id AS prescription_id, pr.prescription_uuid, pr.medications, pr.dosage,
             pr.instructions, pr.valid_until, pr.created_at,
             u.full_name AS doctor_name
      FROM prescriptions pr

@@ -6,12 +6,12 @@ const router = express.Router();
 
 router.post('/', verifyToken, appointmentsController.createAppointment);
 
-router.patch('/:id/status', verifyToken, appointmentsController.updateAppointmentStatus);
-
 router.get('/available-slots', verifyToken, appointmentsController.getDoctorAvailability);
 
 router.get('/patient-appointments', verifyToken, appointmentsController.getPatientAppointments);
 
 router.get('/doctor/:doctor_id', verifyToken, appointmentsController.getDoctorAppointments);
+
+router.patch('/:id/status', verifyToken, appointmentsController.updateAppointmentStatus);
 
 export default router;
