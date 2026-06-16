@@ -1,4 +1,3 @@
-// frontend/src/services/auth.service.js
 import api from './api';
 
 export const patientLogin = async (credentials) => {

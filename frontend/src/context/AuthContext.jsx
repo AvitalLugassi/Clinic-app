@@ -25,10 +25,17 @@ export function AuthProvider({ children }) {
 
   const pickPublicUser = (u) => {
     if (!u || typeof u !== 'object') return null;
-    const { _id, id, name, firstName, lastName, email, role, avatar, phone } = u;
+    const {
+      _id, id, user_uuid, uuid, full_name, fullName,
+      name, firstName, lastName, email, role, avatar, phone
+    } = u;
     const out = {};
     out.id = _id ?? id ?? null;
+    out.user_uuid = user_uuid ?? uuid ?? null;
+    const resolvedFull = full_name ?? fullName ?? name ?? `${firstName ?? ''} ${lastName ?? ''}`.trim();
+    if (resolvedFull) out.full_name = resolvedFull;
     if (name) out.name = name;
+    else if (resolvedFull) out.name = resolvedFull.split(' ')[0];
     if (firstName) out.firstName = firstName;
     if (lastName) out.lastName = lastName;
     if (email) out.email = email;

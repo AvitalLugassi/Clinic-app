@@ -9,7 +9,7 @@ import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import AppointmentCalendar from './pages/AppointmentCalendar/AppointmentCalendar';
 import MedicalRecord from './pages/MedicalRecord/MedicalRecord';
-import PatientProfile from './pages/PatientProfile/PatientProfile';
+import MyProfile from './pages/MyProfile/MyProfile';
 import Reports from './pages/Reports/Reports';
 import NotFound from './pages/NotFound/NotFound';
 import DoctorActivate from './pages/DoctorActivate/DoctorActivate';
@@ -19,7 +19,7 @@ const ROLE_ROUTES = [
   { path: ':uuid/dashboard',     element: <Dashboard />,          roles: ['patient', 'doctor', 'admin'] },
   { path: ':uuid/appointments',  element: <AppointmentCalendar />, roles: ['patient', 'doctor'] },
   { path: ':uuid/records',       element: <MedicalRecord />,       roles: ['patient', 'doctor'] },
-  { path: ':uuid/profile',       element: <PatientProfile />,      roles: ['patient'] },
+  { path: ':uuid/profile',       element: <MyProfile />,      roles: ['patient'] },
   { path: ':uuid/prescriptions', element: <MyPrescriptions />,     roles: ['patient'] },
   { path: ':uuid/reports',       element: <Reports />,             roles: ['admin'] },
 ];

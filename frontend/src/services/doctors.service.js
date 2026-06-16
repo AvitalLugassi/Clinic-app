@@ -36,3 +36,11 @@ export const getAllDoctors = async (filters = {}) => {
   const response = await api.get('/doctors', { params: filters });
   return response.data;
 };
+
+/**
+ * שליפת דשבורד מלא של הרופא המחובר (כולל פרטי הרופא וראיונות עתידיים)
+ */
+export const getMyDashboard = async () => {
+  const response = await api.get('/doctors/me/dashboard');
+  return response.data;
+};

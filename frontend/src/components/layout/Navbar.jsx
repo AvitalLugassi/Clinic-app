@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useAuthContext } from '../../context/AuthContext';
 
 import './Navbar.css';
 
@@ -78,7 +77,7 @@ export default function Navbar({ user, onLogout }) {
                   </div>
                 </div>
                 <div className="dropdown-divider"></div>
-                <Link to="/profile" className="dropdown-item" onClick={() => setShowDropdown(false)}>
+                <Link to={user?.user_uuid ? `/${user.user_uuid}/profile` : '/profile'} className="dropdown-item" onClick={() => setShowDropdown(false)}>
                   <span>👤</span><span>My Profile</span>
                 </Link>
                 <Link to="/terms" className="dropdown-item" onClick={() => setShowDropdown(false)}>
