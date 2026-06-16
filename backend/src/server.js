@@ -22,7 +22,6 @@ process.on('unhandledRejection', (err) => {
 });
 app.use(express.json());
 app.use(cookieParser());
-app.use(logger);
 
 // רישום הראוטים במערכת
 app.use('/api/auth', authRoutes);
@@ -31,11 +30,20 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 
-app.use(errorHandler);
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-  await testConnection();   // בדיקת חיבור MySQL
-  await connectMongo();     // הפעלת חיבור MongoDB (הורדנו את ה- //)
-});
+
+const startServer = async () => {
+  try {
+    await testConnection();   // בדיקת חיבור MySQL
+    await connectMongo();     // הפעלת חיבור MongoDB
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Startup failed:', err.message || err);
+    process.exit(1);
+  }
+};
+
+startServer();

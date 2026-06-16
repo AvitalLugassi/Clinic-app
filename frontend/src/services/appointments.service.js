@@ -14,7 +14,9 @@ export const createAppointment = async (appointmentData) => {
  * @param {number} patientId 
  */
 export const getPatientAppointments = async (patientId) => {
-  const response = await api.get(`/appointments/patient/${patientId}`);
+  const response = await api.get('/appointments/patient-appointments', {
+    params: { patient_id: patientId },
+  });
   return response.data;
 };
 

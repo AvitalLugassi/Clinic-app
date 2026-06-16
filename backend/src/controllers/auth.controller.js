@@ -8,7 +8,11 @@ import { sendRegistrationOtp, sendStaffActivationOtp } from '../services/email.s
 const STAFF_EMAIL_DOMAIN = '@clinic-app.com';
 const hashId = (id) => crypto.createHash('sha256').update(id).digest('hex');
 
-const COOKIE_OPTS = { httpOnly: true, sameSite: 'lax' };
+const COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: false,
+};
 
 const signAndSend = async (res, user) => {
   const accessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });

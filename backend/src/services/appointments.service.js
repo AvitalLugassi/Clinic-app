@@ -1,4 +1,4 @@
-import appointmentsModel from '../models/Appointment.js';
+import appointmentsModel from '../models/Appointment.models.js';
 
 const getAvailableSlots = async (doctorId, date) => {
     return await appointmentsModel.getAvailableSlots(doctorId, date);

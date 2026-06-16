@@ -1,22 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppointmentCard from '../../components/appointments/AppointmentCard';
 import BookingWizard   from '../../components/appointments/BookingWizard';
 import './AppointmentCalendar.css';
-
-// Mock data - יוחלף בקריאות שרת
-const MOCK_APPOINTMENTS = [
-  { id: 1, doctor_name: 'כהן אבי',   doctor_id: 1, department: 'קרדיולוגיה', scheduled_at: new Date(Date.now() + 2  * 86400000).toISOString(), status: 'confirmed' },
-  { id: 2, doctor_name: 'לוי מרים',  doctor_id: 2, department: 'עיניים',      scheduled_at: new Date(Date.now() + 7  * 86400000).toISOString(), status: 'pending'   },
-  { id: 3, doctor_name: 'גולד יוסף', doctor_id: 3, department: 'עצמות',       scheduled_at: new Date(Date.now() - 5  * 86400000).toISOString(), status: 'completed' },
-  { id: 4, doctor_name: 'ברק שרה',   doctor_id: 4, department: 'עור',         scheduled_at: new Date(Date.now() - 10 * 86400000).toISOString(), status: 'cancelled' },
-];
+import { useAuthContext } from '../../context/AuthContext';
+import useFetch from '../../hooks/useFetch';
+import { getPatientAppointments, updateAppointmentStatus } from '../../services/appointments.service';
 
 const TABS = ['תורים עתידיים', 'היסטוריה', 'בקשות ממתינות'];
 
 export default function AppointmentCalendar() {
+  const { user } = useAuthContext();
   const [tab, setTab]               = useState(0);
   const [showWizard, setShowWizard] = useState(false);
-  const [appointments, setAppointments] = useState(MOCK_APPOINTMENTS);
+  const [appointments, setAppointments] = useState([]);
+
+  const { data, loading, error, refetch } = useFetch(
+    () => (user ? getPatientAppointments(user.id) : Promise.resolve([])),
+    [user]
+  );
+
+  useEffect(() => {
+    if (data) setAppointments(data);
+  }, [data]);
 
   const now = new Date();
 
@@ -26,16 +31,24 @@ export default function AppointmentCalendar() {
 
   const lists = [future, history, pending];
 
-  const handleCancel = (id) =>
-    setAppointments((prev) => prev.map((a) => a.id === id ? { ...a, status: 'cancelled' } : a));
+  const handleCancel = async (id) => {
+    try {
+      await updateAppointmentStatus(id, 'cancelled');
+      setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' } : a)));
+    } catch (err) {
+      console.error('Cancel appointment failed', err);
+    }
+  };
 
   const handleBook = (booking) => {
+    // כרגע הפונקציה יוצרת תור מקומי בלבד;
+    // ניתן להרחיב אותה בעתיד לקריאה לשרת עם patient_id, doctor_id ו-scheduled_at.
     const newAppt = {
       id:           Date.now(),
       doctor_name:  booking.doctor.name,
       doctor_id:    booking.doctor.id,
       department:   booking.doctor.department,
-      scheduled_at: new Date().toISOString(), // בפועל יחושב לפי day + time
+      scheduled_at: new Date().toISOString(),
       status:       'pending',
     };
     setAppointments((prev) => [newAppt, ...prev]);
@@ -74,7 +87,17 @@ export default function AppointmentCalendar() {
       </div>
 
       <div className="appt-calendar__list">
-        {lists[tab].length === 0 ? (
+        {loading ? (
+          <div className="appt-calendar__empty">
+            <span>⏳</span>
+            <p>טוען תורים...</p>
+          </div>
+        ) : error ? (
+          <div className="appt-calendar__empty">
+            <span>⚠️</span>
+            <p>{error}</p>
+          </div>
+        ) : lists[tab].length === 0 ? (
           <div className="appt-calendar__empty">
             <span>📭</span>
             <p>אין תורים להצגה</p>

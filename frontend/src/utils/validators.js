@@ -1,4 +1,5 @@
 export const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+// export const isStaffEmail = (email) => isValidEmail(email) && email.endsWith('@clinic-app.com');
 export const isStaffEmail = (email) => isValidEmail(email) && email.endsWith('@clinic-app.com');
 export const isValidIdNumber = (id) => {
   const str = String(id).padStart(9, '0');

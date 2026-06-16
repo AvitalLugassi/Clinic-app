@@ -41,5 +41,5 @@ const medicalRecordSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const MedicalRecord = mongoose.model('MedicalRecord', medicalRecordSchema);
-export default MedicalRecord;
+const medicalRecord = mongoose.model('medicalRecord', medicalRecordSchema);
+export default medicalRecord;

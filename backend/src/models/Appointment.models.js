@@ -1,4 +1,4 @@
-import db from '../config/db.js';
+import db from '../config/db.mysql.js';
 
 const getAvailableSlots = async (doctorId, date) => {
     const query = `
