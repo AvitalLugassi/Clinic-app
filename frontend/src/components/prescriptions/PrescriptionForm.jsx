@@ -1,23 +1,27 @@
 import { useState } from 'react';
 import { createPrescription } from '../../services/prescriptions.service';
 
+
+
+import { useNotifications } from '../../context/NotificationContext';
+
 export default function PrescriptionForm({ patientId, onClose, onSaved }) {
+  const { addToast } = useNotifications();
   const [form, setForm] = useState({ medications: '', dosage: '', instructions: '', valid_until: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
     try {
       await createPrescription({ patient_id: patientId, ...form });
+      addToast('המרשם נשמר בהצלחה', 'success');
       onSaved?.();
       onClose();
     } catch {
-      setError('שגיאה בשמירת המרשם');
+      addToast('שגיאה בשמירת המרשם', 'error');
     } finally {
       setLoading(false);
     }
@@ -38,7 +42,6 @@ export default function PrescriptionForm({ patientId, onClose, onSaved }) {
       <label style={styles.label}>תוקף עד
         <input type="date" name="valid_until" value={form.valid_until} onChange={handleChange} required style={styles.input} />
       </label>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
         <button type="button" onClick={onClose} style={styles.btnSecondary}>ביטול</button>
         <button type="submit" disabled={loading} style={styles.btnPrimary}>{loading ? 'שומר...' : 'שמור מרשם'}</button>

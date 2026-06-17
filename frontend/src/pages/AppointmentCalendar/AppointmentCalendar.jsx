@@ -3,6 +3,7 @@ import AppointmentCard from '../../components/appointments/AppointmentCard';
 import BookingWizard   from '../../components/appointments/BookingWizard';
 import './AppointmentCalendar.css';
 import { useAuthContext } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import useFetch from '../../hooks/useFetch';
 import { getPatientAppointments, getAppointmentsByDoctor, updateAppointmentStatus } from '../../services/appointments.service';
 
@@ -10,6 +11,7 @@ const TABS = ['תורים עתידיים', 'היסטוריה', 'בקשות ממ�
 
 export default function AppointmentCalendar() {
   const { user } = useAuthContext();
+  const { addToast } = useNotifications();
   const [tab, setTab]               = useState(0);
   const [showWizard, setShowWizard] = useState(false);
   const [appointments, setAppointments] = useState([]);
@@ -38,8 +40,9 @@ export default function AppointmentCalendar() {
     try {
       await updateAppointmentStatus(id, 'cancelled');
       setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' } : a)));
+      addToast('התור בוטל בהצלחה', 'success');
     } catch (err) {
-      console.error('Cancel appointment failed', err);
+      addToast('שגיאה בביטול התור', 'error');
     }
   };
 

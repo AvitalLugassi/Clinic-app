@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import useFetch from '../../hooks/useFetch';
 import { getPatientMedicalHistory, createMedicalRecord } from '../../services/medicalRecords.service';
 import { getAppointmentsByDoctor } from '../../services/appointments.service';
@@ -116,14 +117,13 @@ export default function MedicalRecord() {
 }
 
 function NewRecordForm({ patientId, doctorId, onSaved }) {
+  const { addToast } = useNotifications();
   const [form, setForm] = useState({ visit_summary: '', diagnoses: '', prescriptions: '', referrals: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
     try {
       await createMedicalRecord({
         appointment_uuid: `manual-${Date.now()}`,
@@ -134,9 +134,10 @@ function NewRecordForm({ patientId, doctorId, onSaved }) {
         prescriptions: form.prescriptions ? form.prescriptions.split(',').map((s) => s.trim()) : [],
         referrals: form.referrals ? form.referrals.split(',').map((s) => s.trim()) : [],
       });
+      addToast('הרשומה נשמרה בהצלחה', 'success');
       onSaved();
     } catch {
-      setError('שגיאה בשמירת הרשומה');
+      addToast('שגיאה בשמירת הרשומה', 'error');
     } finally {
       setLoading(false);
     }
@@ -158,7 +159,6 @@ function NewRecordForm({ patientId, doctorId, onSaved }) {
       <label style={styles.label}>הפניות (מופרדות בפסיק)
         <input value={form.referrals} onChange={(e) => setForm((f) => ({ ...f, referrals: e.target.value }))} style={styles.input} />
       </label>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
       <button type="submit" disabled={loading} style={styles.btnPrimary}>{loading ? 'שומר...' : 'שמור רשומה'}</button>
     </form>
   );

@@ -3,6 +3,7 @@ import StatsGrid from '../../components/ui/StatsGrid/StatsGrid';
 import Button from '../../components/ui/Button/Button';
 import RegisterUserModal from '../../components/ui/RegisterUserModal/RegisterUserModal';
 import { staffRegister, adminRegisterPatient } from '../../services/auth.service';
+import { useNotifications } from '../../context/NotificationContext';
 
 const STATS = [
   { icon: '🧑‍⚕️', label: 'Total Patients', value: null },
@@ -28,23 +29,25 @@ const STAFF_FIELDS = [
 ];
 
 export default function AdminDashboard() {
-  const [modal, setModal] = useState(null); // 'patient' | 'staff' | null
+  const { addToast } = useNotifications();
+  const [modal, setModal] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  const openModal = (type) => { setModal(type); setError(''); setSuccess(''); };
-  const closeModal = () => { setModal(null); setError(''); setSuccess(''); };
+  const openModal = (type) => { setModal(type); setError(''); };
+  const closeModal = () => { setModal(null); setError(''); };
 
   const handleSubmit = async (data) => {
     setError('');
     setSubmitting(true);
     try {
       const res = modal === 'patient' ? await adminRegisterPatient(data) : await staffRegister(data);
-      setSuccess(res.data.message);
-      setTimeout(closeModal, 1500);
+      addToast(res.data.message, 'success');
+      closeModal();
     } catch (err) {
-      setError(err.response?.data?.message || 'שגיאה, נסה שוב');
+      const msg = err.response?.data?.message || 'שגיאה, נסה שוב';
+      setError(msg);
+      addToast(msg, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -71,7 +74,6 @@ export default function AdminDashboard() {
         onSubmit={handleSubmit}
         submitting={submitting}
         error={error}
-        success={success}
       />
 
       <RegisterUserModal
@@ -82,7 +84,6 @@ export default function AdminDashboard() {
         onSubmit={handleSubmit}
         submitting={submitting}
         error={error}
-        success={success}
       />
     </>
   );

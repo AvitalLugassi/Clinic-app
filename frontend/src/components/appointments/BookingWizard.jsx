@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getAllDoctors } from '../../services/doctors.service';
 import { getDoctorAvailability, createAppointment } from '../../services/appointments.service';
 import { useAuthContext } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import './BookingWizard.css';
 
 const STEPS = ['בחירת רופא', 'בחירת תאריך', 'בחירת שעה'];
@@ -16,6 +17,7 @@ function getNext14Days() {
 
 export default function BookingWizard({ onBook, onClose }) {
   const { user } = useAuthContext();
+  const { addToast } = useNotifications();
   const [step, setStep] = useState(0);
   const [search, setSearch] = useState('');
   const [doctors, setDoctors] = useState([]);
@@ -73,9 +75,12 @@ export default function BookingWizard({ onBook, onClose }) {
         patient_id = Number(adminPatientId);
       }
       await createAppointment({ patient_id, doctor_id: selectedDoctor.id, scheduled_at });
+      addToast('התור נקבע בהצלחה!', 'success');
       onBook?.();
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'שגיאה בקביעת התור');
+      const msg = err.response?.data?.message || err.message || 'שגיאה בקביעת התור';
+      setError(msg);
+      addToast(msg, 'error');
     } finally {
       setSubmitting(false);
     }
